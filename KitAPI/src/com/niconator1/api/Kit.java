@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.niconator1.main.KitPlugin;
+import com.niconator1.main.Util;
 
 public abstract class Kit {
 	private String name;
@@ -17,9 +17,12 @@ public abstract class Kit {
 	private int acooldown;
 	private ItemStack aitem;
 	private Rarity r;
+	private ArrayList<String> description;
 
-	public Kit(String name, String permission, ItemStack icon, Rarity r, String aname, int acooldown, ItemStack aitem) {
+	public Kit(String name, ArrayList<String> description, String permission, ItemStack icon, Rarity r, String aname,
+			int acooldown, ItemStack aitem) {
 		this.name = name;
+		this.description = description;
 		this.permission = permission;
 		this.icon = icon;
 		this.aname = aname;
@@ -33,6 +36,8 @@ public abstract class Kit {
 		ItemMeta im = icon.getItemMeta();
 		im.setDisplayName(ChatColor.RESET + name);
 		ArrayList<String> lore = new ArrayList<String>();
+		lore.addAll(description);
+		lore.add("");
 		lore.add(ChatColor.GRAY + "Rarity: " + r.getColor() + r.name());
 		im.setLore(lore);
 		icon.setItemMeta(im);
@@ -42,7 +47,7 @@ public abstract class Kit {
 		if (hasPermission(p)) {
 			if (isHoldingAbilityItem(p)) {
 				if (isAbilityReady(p)) {
-					KitPlugin.addCooldown(p, acooldown);
+					Util.addCooldown(p, acooldown);
 					activateAbility(p);
 				} else {
 					p.sendMessage(
@@ -70,7 +75,7 @@ public abstract class Kit {
 	}
 
 	public boolean isAbilityReady(Player p) {
-		if (KitPlugin.isAbilityReady(p)) {
+		if (Util.isAbilityReady(p)) {
 			return true;
 		}
 		return false;
@@ -78,6 +83,10 @@ public abstract class Kit {
 
 	public String getName() {
 		return name;
+	}
+
+	public ArrayList<String> getDescription() {
+		return description;
 	}
 
 	public ItemStack getIcon() {
@@ -96,6 +105,8 @@ public abstract class Kit {
 		return r;
 	}
 
-	public abstract void activateAbility(Player p);
+	public abstract void giveKit(Player player);
+
+	public abstract void activateAbility(Player player);
 
 }

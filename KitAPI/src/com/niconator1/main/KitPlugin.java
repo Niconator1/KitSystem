@@ -1,8 +1,11 @@
 package com.niconator1.main;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -16,21 +19,33 @@ import com.niconator1.api.Rarity;
 
 public class KitPlugin extends JavaPlugin {
 
+	private static HashMap<UUID, Kit> choosen = new HashMap<UUID, Kit>();
 	private static ArrayList<Kit> kits = new ArrayList<Kit>();
 	private static ArrayList<Cooldown> cooldown = new ArrayList<Cooldown>();
 	private static ArrayList<Selection> selection = new ArrayList<Selection>();
+	private static ArrayList<Confirm> confirm = new ArrayList<Confirm>();
 
 	public void onEnable() {
-		this.getLogger().info("Kit test loaded");
-		this.getServer().getPluginManager().registerEvents(new EventManager(), this);
 		loadKits();
 		startLoops();
+		this.getServer().getPluginManager().registerEvents(new EventManager(), this);
+		this.getLogger().info("Kit test loaded");
 	}
 
 	public void onDisable() {
+		for (int i = 0; i < cooldown.size(); i++) {
+			Cooldown c = cooldown.get(i);
+			c.getPlayer().setLevel(0);
+			c.getPlayer().setExp(0);
+		}
 		for (int i = 0; i < selection.size(); i++) {
 			Selection s = selection.get(i);
 			Player p = (Player) (s.getInventory().getHolder());
+			p.closeInventory();
+		}
+		for (int i = 0; i < confirm.size(); i++) {
+			Confirm c = confirm.get(i);
+			Player p = (Player) (c.getInventory().getHolder());
 			p.closeInventory();
 		}
 	}
@@ -50,6 +65,7 @@ public class KitPlugin extends JavaPlugin {
 	}
 
 	private void startLoops() {
+		// Cooldown
 		Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			public void run() {
 				for (int i = 0; i < cooldown.size(); i++) {
@@ -75,33 +91,11 @@ public class KitPlugin extends JavaPlugin {
 	private void loadKits() {
 		ItemStack iconht = new ItemStack(Material.IRON_BARDING);
 		ItemStack itemht = new ItemStack(Material.LEASH);
-		HorseTamer ht = new HorseTamer("Horsetamer", "kits.horsetamer", iconht, Rarity.RED, "", 20, itemht);
+		ArrayList<String> description = new ArrayList<String>();
+		description.add("Example description");
+		description.add(ChatColor.DARK_AQUA + "Test");
+		HorseTamer ht = new HorseTamer(description, iconht, Rarity.RED, "", 20, itemht);
 		kits.add(ht);
-	}
-
-	public static void addCooldown(Player p, int acooldown) {
-		Cooldown c = new Cooldown(p, acooldown * 20);
-		cooldown.add(c);
-	}
-
-	public static boolean isAbilityReady(Player p) {
-		for (int i = 0; i < cooldown.size(); i++) {
-			Cooldown c = cooldown.get(i);
-			if (c.getPlayer().getUniqueId().compareTo(p.getUniqueId()) == 0) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public static Cooldown getCooldown(Player p) {
-		for (int i = 0; i < cooldown.size(); i++) {
-			Cooldown c = cooldown.get(i);
-			if (c.getPlayer().getUniqueId().compareTo(p.getUniqueId()) == 0) {
-				return c;
-			}
-		}
-		return null;
 	}
 
 	public static ArrayList<Kit> getKits() {
@@ -112,7 +106,16 @@ public class KitPlugin extends JavaPlugin {
 		return selection;
 	}
 
-	public static void removeSelection(int i) {
-		selection.remove(i);
+	public static HashMap<UUID, Kit> getChoosenKits() {
+		return choosen;
 	}
+
+	public static ArrayList<Cooldown> getCooldown() {
+		return cooldown;
+	}
+
+	public static ArrayList<Confirm> getConfirmationInventories() {
+		return confirm;
+	}
+
 }
