@@ -64,6 +64,7 @@ public class EventManager implements Listener {
 				if (event.getRawSlot() == 24 || event.getRawSlot() == 25 || event.getRawSlot() == 33
 						|| event.getRawSlot() == 34) {
 					Util.addKit(p, c.getKit());
+					c.getKit().giveKit(p);
 					p.closeInventory();
 				} else if (event.getRawSlot() == 53) {
 					confirms.remove(i);
