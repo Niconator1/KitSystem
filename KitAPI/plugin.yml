@@ -1,0 +1,26 @@
+name: KitPlugin
+version: 0.1
+description: >
+  Plugin for kit based abilities
+
+author: Niconator1
+main: com.niconator1.main.KitPlugin
+load: STARTUP
+
+commands:
+    select:
+        description: Opens the kit selection gui
+        permission: kits.choose
+permissions:
+    kits.*:
+        default: true
+        description: All rights
+        children:
+            kits.choose: true
+            kits.horsetamer: true
+    kits.horsetamer:
+        default: false
+        description: Right to choose the kit Horsetamer
+    kits.choose:
+        default: false
+        descriptions: Right to choose a kit
